@@ -12,31 +12,42 @@
       </h1>
 
       <form id="dateForm" class="space-y-4">
-        <!-- Start Date -->
-        <div>
-          <label class="block font-medium mb-1" for="startDate"
-            >Tanggal Mulai</label
-          >
-          <input
-            type="date"
-            id="startDate"
-            class="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300"
-            required
-          />
+        <div id="imageInputs" class="space-y-3">
+          <div class="image-input flex items-center gap-3">
+            <input
+              type="file"
+              name="images[]"
+              accept="image/*"
+              class="file-input block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              type="button"
+              class="remove-btn text-red-500 hover:text-red-700 font-semibold"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
-        <!-- End Date -->
-        <div>
-          <label class="block font-medium mb-1" for="endDate"
-            >Tanggal Berakhir</label
+        <div class="flex justify-between">
+          <button
+            type="button"
+            id="addImageBtn"
+            class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
           >
-          <input
-            type="date"
-            id="endDate"
-            class="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300"
-            required
-          />
+            + Screenshot Presensi SIAPJALA dicrop
+          </button>
         </div>
+
+        <div class="mt-6">
+          <img src="IMG_20251027_211527_cropped.jpg" alt="" class="h-60" />
+          <span>Contoh</span>
+        </div>
+
+        <div
+          id="previewContainer"
+          class="grid grid-cols-3 gap-3 pt-4 border-t border-gray-200"
+        ></div>
 
         <!-- Days to Count -->
         <div>
@@ -69,33 +80,19 @@
                 type="checkbox"
                 value="Minggu"
                 class="mr-2"
-              />Minggu</label
+                disabled
+              />Minggu (edit background merah jadi hitam, teksnya jadi
+              putih)</label
             >
           </div>
         </div>
 
-        <!-- Exclude Dates -->
-        <div>
-          <label class="block font-medium mb-1" for="excludeDates"
-            >Tanggal Tidak Hadir (izin, sakit, tanggal merah, dll)</label
-          >
-          <input
-            type="text"
-            id="excludeDates"
-            placeholder="YYYY-MM-DD, YYYY-MM-DD, ..."
-            class="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300"
-            title="Pisahkan dengan koma, contoh: 2025-06-10, 2025-06-17"
-          />
-          <p class="text-sm text-gray-500 mt-1">
-            Pisahkan dengan koma (contoh: 2025-06-10, 2025-06-17)
-          </p>
-        </div>
-
-        <!-- Start & End Hour -->
-        <div class="grid grid-cols-2 gap-4">
+        <!-- Start Hour -->
+        <div class="grid grid-cols-1 gap-4">
           <div>
             <label class="block font-medium mb-1" for="startHour"
-              >Jam Hadir</label
+              >Jam Hadir (akan ditambahi/dikurangi 1 s.d. 10 menit secara
+              random)</label
             >
             <input
               type="time"
@@ -104,31 +101,7 @@
               required
             />
           </div>
-          <div>
-            <label class="block font-medium mb-1" for="endHour"
-              >Jam Pulang</label
-            >
-            <input
-              type="time"
-              id="endHour"
-              class="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300"
-              required
-            />
-          </div>
         </div>
-
-      <!-- Custom Hours (Dynamic Section) -->
-      <div class="border-t pt-4">
-        <span class="block font-medium mb-2 text-gray-700">Hari Kerja Spesial</span>
-        <p class="text-sm text-gray-500 mb-2">Misal Jumat pulang awal</p>
-
-        <div id="customDaysContainer" class="space-y-3"></div>
-
-        <button type="button" id="addCustomDay" 
-          class="mt-2 text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition">
-          + Tambah Hari Kerja Spesial
-        </button>
-      </div>
 
         <!-- Submit Button -->
         <button
@@ -185,138 +158,35 @@
             karakter di samping kanannya menjadi _ <br />
             <img src="assets/settings.png" alt="" class="w-full" />
           </li>
-          <li>
-            Klik <i>OK</i>
-          </li>
+          <li>Klik <i>OK</i></li>
         </ol>
       </div>
     </div>
 
-    <script>
-      const dayNames = [
-        "Minggu",
-        "Senin",
-        "Selasa",
-        "Rabu",
-        "Kamis",
-        "Jumat",
-        "Sabtu",
-      ];
-      const monthNames = [
-        "Januari",
-        "Februari",
-        "Maret",
-        "April",
-        "Mei",
-        "Juni",
-        "Juli",
-        "Agustus",
-        "September",
-        "Oktober",
-        "November",
-        "Desember",
-      ];
+    <!-- Loading Modal -->
+    <div
+      id="loadingModal"
+      class="fixed inset-0 flex items-center justify-center bg-black/50 opacity-0 pointer-events-none transition-opacity duration-200 z-50"
+    >
+      <div
+        class="bg-white rounded-2xl px-6 py-5 shadow-lg flex items-center space-x-4 transform translate-y-2 transition-transform duration-200"
+      >
+        <!-- Spinner -->
+        <div
+          class="w-8 h-8 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"
+        ></div>
 
-    // Add a new custom day row dynamically
-    document.getElementById("addCustomDay").addEventListener("click", () => {
-      const container = document.getElementById("customDaysContainer");
-      const id = `custom-${Date.now()}`;
-      const div = document.createElement("div");
-      div.className = "flex flex-wrap items-center gap-2 border rounded-lg p-2 bg-gray-50";
-      div.innerHTML = `
-        <select class="day-select border rounded px-2 py-1" required>
-          <option value="">Pilih Hari Kerja Spesial</option>
-          ${dayNames.map(d => `<option value="${d}">${d}</option>`).join("")}
-        </select>
-        <input type="time" class="start border rounded px-2 py-1" required>
-        <input type="time" class="end border rounded px-2 py-1" required>
-        <button type="button" class="remove bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Remove</button>
-      `;
-      container.appendChild(div);
+        <!-- Text -->
+        <p class="text-gray-800 text-base font-medium">
+          Loading, please wait...
+        </p>
+      </div>
+    </div>
 
-      // Remove row
-      div.querySelector(".remove").addEventListener("click", () => div.remove());
-    });
-
-      document
-        .getElementById("dateForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
-
-          const startDate = new Date(
-            document.getElementById("startDate").value
-          );
-          const endDate = new Date(document.getElementById("endDate").value);
-          const defaultStart = document
-            .getElementById("startHour").value;
-          const defaultEnd = document
-            .getElementById("endHour").value;
-          const daysToCount = Array.from(
-            document.querySelectorAll("input[type=checkbox]:checked")
-          ).map((cb) => cb.value);
-
-          // Parse excluded dates
-          const excludeDatesInput = document
-            .getElementById("excludeDates")
-            .value.trim();
-          const excludeDates = excludeDatesInput
-            ? excludeDatesInput.split(",").map((d) => d.trim())
-            : [];
-
-      // Collect custom day hours
-      const customHours = {};
-      document.querySelectorAll("#customDaysContainer > div").forEach(div => {
-        const day = div.querySelector(".day-select").value;
-        const start = div.querySelector(".start").value;
-        const end = div.querySelector(".end").value;
-        if (day) {
-          if (!daysToCount.includes(day)) {
-            daysToCount.push(day);
-          }
-          customHours[day] = { start, end };
-        }
-      });
-
-          let current = new Date(startDate);
-          let counter = 1;
-          const result = ["No_Hari/Tanggal_Jam Datang_Jam Pulang_Keterangan"];
-
-          while (current <= endDate) {
-            const isoDate = current.toISOString().split("T")[0]; // e.g. 2025-06-10
-            const dayName = dayNames[current.getDay()];
-
-            if (
-              daysToCount.includes(dayName) &&
-              !excludeDates.includes(isoDate)
-            ) {
-              const formattedDate = `${current.getDate()} ${
-                monthNames[current.getMonth()]
-              } ${current.getFullYear()}`;
-
-              const startHour = (customHours[dayName]?.start || defaultStart).replace(":", ".");
-              const endHour = (customHours[dayName]?.end || defaultEnd).replace(":", ".");
-              
-              result.push(
-                `${counter}_${dayName}, ${formattedDate}_${startHour}_${endHour}_-`
-              );
-              counter++;
-            }
-            current.setDate(current.getDate() + 1);
-          }
-
-          document.getElementById("output").value =
-            result.join("\n") || "(no matching days)";
-        });
-
-      // Copy to clipboard feature
-      document.getElementById("copyBtn").addEventListener("click", function () {
-        const output = document.getElementById("output");
-        output.select();
-        output.setSelectionRange(0, 99999);
-        document.execCommand("copy");
-        this.textContent = "Disalin";
-        setTimeout(() => (this.textContent = "Salin Teks"), 1500);
-      });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="loadingAnimation.js"></script>
+    <script src="tesseractOCR.js"></script>
+    <script src="tableFormatConverter.js"></script>
+    <script src="dynamicImage.js"></script>
   </body>
 </html>
