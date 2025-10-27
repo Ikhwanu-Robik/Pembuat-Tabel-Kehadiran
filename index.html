@@ -248,9 +248,9 @@
           );
           const endDate = new Date(document.getElementById("endDate").value);
           const defaultStart = document
-            .getElementById("startHour");
+            .getElementById("startHour").value;
           const defaultEnd = document
-            .getElementById("endHour");
+            .getElementById("endHour").value;
           const daysToCount = Array.from(
             document.querySelectorAll("input[type=checkbox]:checked")
           ).map((cb) => cb.value);
@@ -270,6 +270,9 @@
         const start = div.querySelector(".start").value;
         const end = div.querySelector(".end").value;
         if (day) {
+          if (!daysToCount.includes(day)) {
+            daysToCount.push(day);
+          }
           customHours[day] = { start, end };
         }
       });
@@ -290,8 +293,8 @@
                 monthNames[current.getMonth()]
               } ${current.getFullYear()}`;
 
-              const startHour = (customHours[dayName]?.start || defaultStart).value.replace(":", ".");
-              const endHour = (customHours[dayName]?.end || defaultEnd).value.replace(":", ".");
+              const startHour = (customHours[dayName]?.start || defaultStart).replace(":", ".");
+              const endHour = (customHours[dayName]?.end || defaultEnd).replace(":", ".");
               
               result.push(
                 `${counter}_${dayName}, ${formattedDate}_${startHour}_${endHour}_-`
