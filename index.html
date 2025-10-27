@@ -117,6 +117,19 @@
           </div>
         </div>
 
+      <!-- Custom Hours (Dynamic Section) -->
+      <div class="border-t pt-4">
+        <span class="block font-medium mb-2 text-gray-700">Hari Kerja Spesial</span>
+        <p class="text-sm text-gray-500 mb-2">Misal Jumat pulang awal</p>
+
+        <div id="customDaysContainer" class="space-y-3"></div>
+
+        <button type="button" id="addCustomDay" 
+          class="mt-2 text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition">
+          + Tambah Hari Kerja Spesial
+        </button>
+      </div>
+
         <!-- Submit Button -->
         <button
           type="submit"
@@ -204,6 +217,27 @@
         "Desember",
       ];
 
+    // Add a new custom day row dynamically
+    document.getElementById("addCustomDay").addEventListener("click", () => {
+      const container = document.getElementById("customDaysContainer");
+      const id = `custom-${Date.now()}`;
+      const div = document.createElement("div");
+      div.className = "flex flex-wrap items-center gap-2 border rounded-lg p-2 bg-gray-50";
+      div.innerHTML = `
+        <select class="day-select border rounded px-2 py-1" required>
+          <option value="">Pilih Hari Kerja Spesial</option>
+          ${dayNames.map(d => `<option value="${d}">${d}</option>`).join("")}
+        </select>
+        <input type="time" class="start border rounded px-2 py-1" required>
+        <input type="time" class="end border rounded px-2 py-1" required>
+        <button type="button" class="remove bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Remove</button>
+      `;
+      container.appendChild(div);
+
+      // Remove row
+      div.querySelector(".remove").addEventListener("click", () => div.remove());
+    });
+
       document
         .getElementById("dateForm")
         .addEventListener("submit", function (e) {
@@ -213,12 +247,10 @@
             document.getElementById("startDate").value
           );
           const endDate = new Date(document.getElementById("endDate").value);
-          const startHour = document
-            .getElementById("startHour")
-            .value.replace(":", ".");
-          const endHour = document
-            .getElementById("endHour")
-            .value.replace(":", ".");
+          const defaultStart = document
+            .getElementById("startHour");
+          const defaultEnd = document
+            .getElementById("endHour");
           const daysToCount = Array.from(
             document.querySelectorAll("input[type=checkbox]:checked")
           ).map((cb) => cb.value);
@@ -230,6 +262,17 @@
           const excludeDates = excludeDatesInput
             ? excludeDatesInput.split(",").map((d) => d.trim())
             : [];
+
+      // Collect custom day hours
+      const customHours = {};
+      document.querySelectorAll("#customDaysContainer > div").forEach(div => {
+        const day = div.querySelector(".day-select").value;
+        const start = div.querySelector(".start").value;
+        const end = div.querySelector(".end").value;
+        if (day) {
+          customHours[day] = { start, end };
+        }
+      });
 
           let current = new Date(startDate);
           let counter = 1;
@@ -246,6 +289,10 @@
               const formattedDate = `${current.getDate()} ${
                 monthNames[current.getMonth()]
               } ${current.getFullYear()}`;
+
+              const startHour = (customHours[dayName]?.start || defaultStart).value.replace(":", ".");
+              const endHour = (customHours[dayName]?.end || defaultEnd).value.replace(":", ".");
+              
               result.push(
                 `${counter}_${dayName}, ${formattedDate}_${startHour}_${endHour}_-`
               );
