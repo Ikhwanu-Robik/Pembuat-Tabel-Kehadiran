@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Generate Date List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div class="bg-white shadow-lg rounded-2xl p-8 w-full max-w-lg">
+      <h1 class="text-2xl font-bold mb-6 text-center text-black">
+        Pembuat Tabel Kehadiran
+      </h1>
+
+      <form id="dateForm" class="space-y-4">
+        <!-- Start Date -->
+        <div>
+          <label class="block font-medium mb-1" for="startDate"
+            >Tanggal Mulai</label
+          >
+          <input
+            type="date"
+            id="startDate"
+            class="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300"
+            required
+          />
+        </div>
+
+        <!-- End Date -->
+        <div>
+          <label class="block font-medium mb-1" for="endDate"
+            >Tanggal Berakhir</label
+          >
+          <input
+            type="date"
+            id="endDate"
+            class="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300"
+            required
+          />
+        </div>
+
+        <!-- Days to Count -->
+        <div>
+          <span class="block font-medium mb-1">Hari Kerja</span>
+          <div class="grid grid-cols-2 gap-2">
+            <label
+              ><input type="checkbox" value="Senin" class="mr-2" />Senin</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                value="Selasa"
+                class="mr-2"
+              />Selasa</label
+            >
+            <label
+              ><input type="checkbox" value="Rabu" class="mr-2" />Rabu</label
+            >
+            <label
+              ><input type="checkbox" value="Kamis" class="mr-2" />Kamis</label
+            >
+            <label
+              ><input type="checkbox" value="Jumat" class="mr-2" />Jumat</label
+            >
+            <label
+              ><input type="checkbox" value="Sabtu" class="mr-2" />Sabtu</label
+            >
+            <label
+              ><input
+                type="checkbox"
+                value="Minggu"
+                class="mr-2"
+              />Minggu</label
+            >
+          </div>
+        </div>
+
+        <!-- Exclude Dates -->
+        <div>
+          <label class="block font-medium mb-1" for="excludeDates"
+            >Tanggal Tidak Hadir (izin, sakit, tanggal merah, dll)</label
+          >
+          <input
+            type="text"
+            id="excludeDates"
+            placeholder="YYYY-MM-DD, YYYY-MM-DD, ..."
+            class="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300"
+            title="Pisahkan dengan koma, contoh: 2025-06-10, 2025-06-17"
+          />
+          <p class="text-sm text-gray-500 mt-1">
+            Pisahkan dengan koma (contoh: 2025-06-10, 2025-06-17)
+          </p>
+        </div>
+
+        <!-- Start & End Hour -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block font-medium mb-1" for="startHour"
+              >Jam Hadir</label
+            >
+            <input
+              type="time"
+              id="startHour"
+              class="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300"
+              required
+            />
+          </div>
+          <div>
+            <label class="block font-medium mb-1" for="endHour"
+              >Jam Pulang</label
+            >
+            <input
+              type="time"
+              id="endHour"
+              class="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+        >
+          Buat
+        </button>
+      </form>
+
+      <!-- Result -->
+      <div class="mt-6">
+        <label class="block font-medium mb-1">Hasil</label>
+        <textarea
+          id="output"
+          rows="8"
+          readonly
+          class="w-full border rounded-lg px-3 py-2 font-mono text-sm bg-gray-50"
+        ></textarea>
+
+        <button
+          id="copyBtn"
+          class="mt-3 w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-800 transition"
+        >
+          Salin Teks
+        </button>
+      </div>
+
+      <!-- Converting to Table example -->
+      <div class="mt-6">
+        <h2 class="text-2xl font-bold mb-6 text-center text-black">
+          Cara Merubah Teks Hasil ke Tabel di Microsoft Word
+        </h2>
+        <ol class="list-decimal list-outside">
+          <li>
+            Salin teks hasil <br />
+            <img src="../assets/copy.png" alt="" class="w-full" />
+          </li>
+          <li>
+            Tempel ke dokumen di Microsoft Word <br />
+            <img src="../assets/paste.png" alt="" class="w-full" />
+          </li>
+          <li>
+            Blok seluruh teks yang ditempel <br />
+            <img src="../assets/select_all.png" alt="" class="w-full" />
+          </li>
+          <li>
+            Buka tab <i>Insert</i>, klik <i>Table</i>, lalu pilih
+            <i>Convert text to table</i> <br />
+            <img src="../assets/convert-to-table.png" alt="" class="w-full" />
+          </li>
+          <li>
+            Pada bagian <i>Separate text at</i>, klik <i>Other</i>, lalu ganti
+            karakter di samping kanannya menjadi _ <br />
+            <img src="../assets/settings.png" alt="" class="w-full" />
+          </li>
+          <li>
+            Klik <i>OK</i>
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <script>
+      const dayNames = [
+        "Minggu",
+        "Senin",
+        "Selasa",
+        "Rabu",
+        "Kamis",
+        "Jumat",
+        "Sabtu",
+      ];
+      const monthNames = [
+        "Januari",
+        "Februari",
+        "Maret",
+        "April",
+        "Mei",
+        "Juni",
+        "Juli",
+        "Agustus",
+        "September",
+        "Oktober",
+        "November",
+        "Desember",
+      ];
+
+      document
+        .getElementById("dateForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const startDate = new Date(
+            document.getElementById("startDate").value
+          );
+          const endDate = new Date(document.getElementById("endDate").value);
+          const startHour = document
+            .getElementById("startHour")
+            .value.replace(":", ".");
+          const endHour = document
+            .getElementById("endHour")
+            .value.replace(":", ".");
+          const daysToCount = Array.from(
+            document.querySelectorAll("input[type=checkbox]:checked")
+          ).map((cb) => cb.value);
+
+          // Parse excluded dates
+          const excludeDatesInput = document
+            .getElementById("excludeDates")
+            .value.trim();
+          const excludeDates = excludeDatesInput
+            ? excludeDatesInput.split(",").map((d) => d.trim())
+            : [];
+
+          let current = new Date(startDate);
+          let counter = 1;
+          const result = ["No_Hari/Tanggal_Jam Datang_Jam Pulang_Keterangan"];
+
+          while (current <= endDate) {
+            const isoDate = current.toISOString().split("T")[0]; // e.g. 2025-06-10
+            const dayName = dayNames[current.getDay()];
+
+            if (
+              daysToCount.includes(dayName) &&
+              !excludeDates.includes(isoDate)
+            ) {
+              const formattedDate = `${current.getDate()} ${
+                monthNames[current.getMonth()]
+              } ${current.getFullYear()}`;
+              result.push(
+                `${counter}_${dayName}, ${formattedDate}_${startHour}_${endHour}_-`
+              );
+              counter++;
+            }
+            current.setDate(current.getDate() + 1);
+          }
+
+          document.getElementById("output").value =
+            result.join("\n") || "(no matching days)";
+        });
+
+      // Copy to clipboard feature
+      document.getElementById("copyBtn").addEventListener("click", function () {
+        const output = document.getElementById("output");
+        output.select();
+        output.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        this.textContent = "Disalin";
+        setTimeout(() => (this.textContent = "Salin Teks"), 1500);
+      });
+    </script>
+  </body>
+</html>
