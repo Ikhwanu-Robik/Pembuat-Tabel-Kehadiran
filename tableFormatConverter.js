@@ -91,6 +91,7 @@ class TableFormatConverter {
 
       return { ...item, startHour: startHourText };
     });
+  }
 
     sortByMonth(arr) {
       const monthOrder = [
