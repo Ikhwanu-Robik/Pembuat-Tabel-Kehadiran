@@ -91,12 +91,24 @@ class TableFormatConverter {
 
       return { ...item, startHour: startHourText };
     });
-  }
+
+    sortByMonth(arr) {
+      const monthOrder = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+      ];
+
+      return arr.sort((a, b) => {
+        const monthA = monthOrder.indexOf(a.month);
+        const monthB = monthOrder.indexOf(b.month);
+        return monthA - monthB;
+      });
+    }
 
   format(arr) {
-    let cleanArr = this.addStartHour(
+    let cleanArr = this.sortByMonth(this.addStartHour(
       this.splitDateTime(this.filterValidDays(arr))
-    );
+    ));
 
     const result = ["No_Hari/Tanggal_Jam Datang_Jam Pulang_Keterangan"];
 
