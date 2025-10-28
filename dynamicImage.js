@@ -1,5 +1,6 @@
 const tesseractOCR = new TesseractOCRWrapper();
 const tableFormatConverter = new TableFormatConverter();
+const imageBgColEditor = new ImageBgColEdtior();
 
 const DMform = document.getElementById("dateForm");
 const imageInputs = document.getElementById("imageInputs");
@@ -69,7 +70,20 @@ DMform.addEventListener("submit", async (e) => {
       return;
     }
 
-    let arr = await tesseractOCR.recognizeImage(files);
+    const processedFiles = [];
+    for (const file of files) {
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+
+      img.onload = () => {
+        processedFiles.push(imageBgColEditor.changeAllRed(img, tolerance = 55));
+
+        // Clean up memory
+        URL.revokeObjectURL(img.src);
+      };
+    }
+
+    let arr = await tesseractOCR.recognizeImage(processedFiles);
     let result = tableFormatConverter.format(arr);
 
     document.getElementById("output").value =
