@@ -3,7 +3,7 @@ class TesseractOCRWrapper {
     return arr.map((str) => str.replace(/\|+$/, "").trim());
   }
 
-  async recognizeImage(files) {
+  /*async recognizeImage(files) {
     const worker = await Tesseract.createWorker("ind");
     let allResult = [];
 
@@ -20,5 +20,25 @@ class TesseractOCRWrapper {
     await worker.terminate();
 
     return finalResult;
-  }
+  }*/
+  
+  async recognizeImage(files) {
+  const worker = await Tesseract.createWorker("ind");
+
+  const promises = files.map(async (file) => {
+    console.log("starting to recognize file");
+    const ret = await worker.recognize(file);
+    const resultArr = ret.data.text.split(/\r?\n/);
+    return resultArr;
+  });
+
+  const results = await Promise.all(promises);
+  const allResult = results.flat(); // flatten array of arrays
+
+  const finalResult = this.removeTrailingPipes(allResult);
+
+  await worker.terminate();
+  
+  return finalResult;
+}
 }
