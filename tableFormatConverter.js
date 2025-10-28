@@ -42,7 +42,7 @@ class TableFormatConverter {
       const date = parseInt(parts[0]);
       const month = parts[1];
       const year = parseInt(parts[2]);
-      const endHour = parts[3];
+      const endHour = parts[3] ? parts[3] : "TglKosong";
 
       return { day, date, month, year, endHour };
     });
@@ -105,11 +105,21 @@ class TableFormatConverter {
         return monthA - monthB;
       });
     }
+    
+    replaceColonsWithDots(arr) {
+  return arr.map(item => ({
+    ...item,
+    startHour: item.startHour.replace(/:/g, "."),
+    endHour: item.endHour.replace(/:/g, ".")
+  }));
+}
 
   format(arr) {
-    let cleanArr = this.sortByMonth(this.addStartHour(
-      this.splitDateTime(this.filterValidDays(arr))
-    ));
+   let sortedArr = this.sortByMonth(this.addStartHour(
+  this.splitDateTime(this.filterValidDays(arr))
+));
+
+    let cleanArr = this.replaceColonsWithDots(sortedArr);
 
     const result = ["No_Hari/Tanggal_Jam Datang_Jam Pulang_Keterangan"];
 
