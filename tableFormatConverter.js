@@ -16,7 +16,7 @@ class TableFormatConverter {
     "Desember",
   ];
 
-  filterValidDays(arr) {
+    filterOffDays(arr) {
     const days = Array.from(
       document.querySelectorAll("input[type=checkbox]:checked")
     ).map((cb) => cb.value);
@@ -25,8 +25,18 @@ class TableFormatConverter {
       return [];
     }
 
+    return arr.map((element) => {
+      if (days.includes(element.day)) {
+        return { ...element, description: "-" };
+      } else {
+        return { ...element, startHour: "-", endHour: "-", description: "OFF" };
+      }
+    });
+  }
+
+  filterValidDays(arr) {
     // Create a regex to match if the string starts with one of the day names
-    const pattern = new RegExp(`^(${days.join("|")})\\b`, "i");
+    const pattern = new RegExp(`^(${this.dayNames.join("|")})\\b`, "i");
 
     // Filter array
     return arr.filter((str) => pattern.test(str.trim()));
@@ -119,14 +129,14 @@ class TableFormatConverter {
   this.splitDateTime(this.filterValidDays(arr))
 ));
 
-    let cleanArr = this.replaceColonsWithDots(sortedArr);
+    let cleanArr = this.filterOffDays(this.replaceColonsWithDots(sortedArr));
 
     const result = ["No_Hari/Tanggal_Jam Datang_Jam Pulang_Keterangan"];
 
     cleanArr.forEach((element, index) => {
       let formatted = `${index + 1}_${element.day}, ${element.date} ${
         element.month
-      } ${element.year}_${element.startHour}_${element.endHour}_-`;
+      } ${element.year}_${element.startHour}_${element.endHour}_${element.description}`;
       result.push(formatted);
     });
 
