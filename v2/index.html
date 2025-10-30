@@ -200,6 +200,36 @@
         "Desember",
       ];
 
+     function randomizeTime(timeStr) {
+    // Parse hour and minute
+    let [hour, minute] = timeStr.split(":").map(Number);
+
+    // Randomly decide whether to add (+1) or subtract (-1)
+    const direction = Math.random() < 0.5 ? -1 : 1;
+
+    // Random number of minutes between 1 and 10
+    const delta = Math.floor(Math.random() * 10) + 1;
+
+    // Apply change
+    let newMinute = minute + direction * delta;
+
+    // Adjust hour and minute if needed
+    if (newMinute >= 60) {
+      newMinute -= 60;
+      hour = (hour + 1) % 24;
+    } else if (newMinute < 0) {
+      newMinute += 60;
+      hour = (hour - 1 + 24) % 24;
+    }
+
+    // Format result with leading zeros
+    const formatted = `${hour.toString().padStart(2, "0")}:${newMinute
+      .toString()
+      .padStart(2, "0")}`;
+
+    return formatted;
+  }
+
     // Add a new custom day row dynamically
     document.getElementById("addCustomDay").addEventListener("click", () => {
       const container = document.getElementById("customDaysContainer");
@@ -260,22 +290,21 @@
             const isoDate = current.toISOString().split("T")[0]; // e.g. 2025-06-10
             const dayName = dayNames[current.getDay()];
 
-            if (
-              daysToCount.includes(dayName) &&
-              !excludeDates.includes(isoDate)
-            ) {
               const formattedDate = `${current.getDate()} ${
                 monthNames[current.getMonth()]
               } ${current.getFullYear()}`;
 
-              const startHour = (customHours[dayName]?.start || defaultStart).replace(":", ".");
-              const endHour = (customHours[dayName]?.end || defaultEnd).replace(":", ".");
+              let isWorkDay = daysToCount.includes(dayName);
+
+              const startHour = isWorkDay ? randomizeTime((customHours[dayName]?.start || defaultStart)).replace(":", ".") : "-";
+              const endHour = isWorkDay ? randomizeTime((customHours[dayName]?.end || defaultEnd)).replace(":", ".") : "-";
+              const description = isWorkDay ? "-" : "OFF";
               
               result.push(
-                `${counter}_${dayName}, ${formattedDate}_${startHour}_${endHour}_-`
+                `${counter}_${dayName}, ${formattedDate}_${startHour}_${endHour}_${description}`
               );
               counter++;
-            }
+              
             current.setDate(current.getDate() + 1);
           }
 
