@@ -74,23 +74,6 @@
           </div>
         </div>
 
-        <!-- Exclude Dates -->
-        <div>
-          <label class="block font-medium mb-1" for="excludeDates"
-            >Tanggal Tidak Hadir (izin, sakit, tanggal merah, dll)</label
-          >
-          <input
-            type="text"
-            id="excludeDates"
-            placeholder="YYYY-MM-DD, YYYY-MM-DD, ..."
-            class="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-blue-300"
-            title="Pisahkan dengan koma, contoh: 2025-06-10, 2025-06-17"
-          />
-          <p class="text-sm text-gray-500 mt-1">
-            Pisahkan dengan koma (contoh: 2025-06-10, 2025-06-17)
-          </p>
-        </div>
-
         <!-- Start & End Hour -->
         <div class="grid grid-cols-2 gap-4">
           <div>
@@ -254,14 +237,6 @@
           const daysToCount = Array.from(
             document.querySelectorAll("input[type=checkbox]:checked")
           ).map((cb) => cb.value);
-
-          // Parse excluded dates
-          const excludeDatesInput = document
-            .getElementById("excludeDates")
-            .value.trim();
-          const excludeDates = excludeDatesInput
-            ? excludeDatesInput.split(",").map((d) => d.trim())
-            : [];
 
       // Collect custom day hours
       const customHours = {};
